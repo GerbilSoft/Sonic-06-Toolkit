@@ -105,6 +105,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\ArcPackerLib\ArcPacker.cs" />
+    <Compile Include="src\ArcPackerLib\ZlibStream.cs" />
     <Compile Include="src\Sonic-06-Toolkit\ToolkitCommandLine.cs" />
     <Compile Include="src\Sonic-06-Toolkit\ToolkitChooser.cs">
       <SubType>Form</SubType>
