@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -104,7 +104,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="src\Sonic-06-Toolkit\ArcPacker.cs" />
+    <Compile Include="src\ArcPackerLib\ArcPacker.cs" />
     <Compile Include="src\Sonic-06-Toolkit\ToolkitCommandLine.cs" />
     <Compile Include="src\Sonic-06-Toolkit\ToolkitChooser.cs">
       <SubType>Form</SubType>
