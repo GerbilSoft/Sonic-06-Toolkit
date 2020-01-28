@@ -93,6 +93,11 @@ namespace ArcPackerLib
                 // Can't read from this stream.
                 throw new ArgumentException("Specified stream is not writable.", "stream");
             }
+            else if (mode != CompressionMode.Compress && mode != CompressionMode.Decompress)
+            {
+                // Invalid CompressionMode.
+                throw new ArgumentException("Invalid CompressionMode.", "mode");
+            }
 
             _stream = stream;
             _mode = mode;
@@ -104,10 +109,43 @@ namespace ArcPackerLib
             }
             else
             {
-                // TODO: Support decompression.
-                throw new ArgumentException("CompressionMode.Decompress is not supported yet.", "mode");
+                // Verify the zlib header.
+                // Reference: https://tools.ietf.org/html/rfc1950
+                // Two bytes: CMF FLG
+                // CMF: Compression method
+                //      bits 0-3 = CM: compression method (8 for Deflate)
+                //      bits 4-7 = CINFO: window size (7 for 2^(7+8) == 2^15 == 32 KB)
+                //      zlib is *always* 0x78. (Deflate, 32 KB)
+                // FLG: Flags
+                //      bits 0-4 = FCHECK: check bits for CMF and FLG
+                //      bit    5 = FDICT: preset dictionary
+                //      bits 6-7 = FLEVEL: compression level
+                // FCHECK must be set such that when CMF/FLG is viewed as
+                // a 16-bit BE unsigned int, CMFFLG % 31 == 0.
+                byte[] zlibHeader = new byte[2];
+                _stream.Read(zlibHeader, 0, zlibHeader.Length);
+
+                // Check CMF.
+                if (zlibHeader[0] != 0x78)
+                {
+                    // Not Deflate with 32 KB window.
+                    throw new FileFormatException("zlib header has an incorrect CMF byte.");
+                }
+
+                // Check FCHECK.
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(zlibHeader);
+                }
+                UInt16 CMFFLG = BitConverter.ToUInt16(zlibHeader, 0);
+                if (CMFFLG % 31 != 0)
+                {
+                    // Checksum error.
+                    throw new FileFormatException("zlib header has an incorrect checksum.");
+                }
             }
 
+            // TODO: Adler-32 checksum handling. (Check GzipStream?)
             _deflateStream = new DeflateStream(stream, mode, true);
         }
 
